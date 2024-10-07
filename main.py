@@ -23,16 +23,14 @@ service = Service(ChromeDriverManager().install())
 # Initialize WebDriver
 driver = webdriver.Chrome(service=service, options=chrome_options)
 page_count = 2
+start_page = 12
+# end_page = 198
+end_page = start_page + page_count - 1
 
 drivers = [
     webdriver.Chrome(service=service, options=chrome_options) for _ in range(page_count)
 ]
 
-
-# Define the range of pages you want to scrape
-start_page = 10
-# end_page = 198
-end_page = start_page + page_count - 1
 
 # Path to the log file
 log_file_path = "found_words.log"
@@ -75,8 +73,9 @@ def is_captcha_present(driver):
 with open(log_file_path, "w", encoding="utf-8") as log_file:
     log_file.write("Found Words:\n")
 
-    try:
-        for page_num, driver in enumerate(drivers, start=start_page):
+    for page_num, driver in enumerate(drivers, start=start_page):
+
+        try:
 
             url = f"https://forvo.com/languages-pronunciations/ga/page-{page_num}/"
             log_message(f"\nNavigating to: {url}", log_file)
@@ -110,13 +109,13 @@ with open(log_file_path, "w", encoding="utf-8") as log_file:
 
             time.sleep(1)
 
-    except KeyboardInterrupt:
-        log_message("Script interrupted by user.", log_file)
+        except KeyboardInterrupt:
+            log_message("Script interrupted by user.", log_file)
 
-    finally:
-        # Close the browser after all operations
-        driver.quit()
-        log_message(
-            "Scraping completed. All found words have been logged to 'found_words.log'.",
-            log_file,
-        )
+        finally:
+            # Close the browser after all operations
+            driver.quit()
+            log_message(
+                "Scraping completed. All found words have been logged to 'found_words.log'.",
+                log_file,
+            )
