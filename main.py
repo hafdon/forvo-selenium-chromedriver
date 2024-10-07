@@ -48,6 +48,10 @@ with open(log_file_path, "a", encoding="utf-8") as log_file:
                     EC.presence_of_element_located((By.TAG_NAME, "h1"))
                 )
 
+                # After loading the page
+                with open(f"page_{page_num}_source.html", "w", encoding="utf-8") as f:
+                    f.write(driver.page_source)
+
                 # Retrieve and print the header text
                 try:
                     header_element = driver.find_element(By.TAG_NAME, "h1")
