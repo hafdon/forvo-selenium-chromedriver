@@ -11,7 +11,6 @@ from selenium.common.exceptions import (
     WebDriverException,
 )
 import time
-import sys
 
 # Optional: Configure Chrome options
 chrome_options = Options()
@@ -23,10 +22,17 @@ service = Service(ChromeDriverManager().install())
 
 # Initialize WebDriver
 driver = webdriver.Chrome(service=service, options=chrome_options)
+page_count = 2
+
+drivers = [
+    webdriver.Chrome(service=service, options=chrome_options) for _ in range(page_count)
+]
+
 
 # Define the range of pages you want to scrape
-start_page = 4
-end_page = 198
+start_page = 10
+# end_page = 198
+end_page = start_page + page_count - 1
 
 # Path to the log file
 log_file_path = "found_words.log"
@@ -41,7 +47,7 @@ def log_message(message, log_file):
 # Function to detect CAPTCHA presence
 def is_captcha_present(driver):
     try:
-        # Common CAPTCHA iframe
+        # Common CAPTCHA iframe (e.g., reCAPTCHA)
         driver.find_element(By.XPATH, "//iframe[contains(@src, 'captcha')]")
         return True
     except NoSuchElementException:
@@ -55,67 +61,44 @@ def is_captcha_present(driver):
         pass
 
     # Add more detection logic if necessary
+    # Example: Check for specific text that appears with CAPTCHA
+    try:
+        driver.find_element(By.XPATH, "//*[contains(text(), 'verify you are human')]")
+        return True
+    except NoSuchElementException:
+        pass
+
     return False
 
 
-# Open the log file in append mode
+# Open the log file in write mode to start fresh
 with open(log_file_path, "w", encoding="utf-8") as log_file:
     log_file.write("Found Words:\n")
 
     try:
-        for page_num in range(start_page, end_page + 1):
+        for page_num, driver in enumerate(drivers, start=start_page):
+
             url = f"https://forvo.com/languages-pronunciations/ga/page-{page_num}/"
-            log_message(f"Navigating to: {url}", log_file)
+            log_message(f"\nNavigating to: {url}", log_file)
             driver.get(url)
 
-            # Wait for the page to load completely using explicit wait
             try:
-                # Wait until either the words are present or a CAPTCHA is detected
-                WebDriverWait(driver, 10).until(
+                WebDriverWait(driver, 5).until(
                     lambda d: d.find_elements(By.CSS_SELECTOR, "a.word > span")
-                    or is_captcha_present(d)
                 )
             except TimeoutException:
                 log_message(
-                    f"Timeout while waiting for elements on page {page_num}. Skipping to next page.",
+                    f"Timeout while waiting for elements on page {page_num}.",
                     log_file,
                 )
                 continue  # Skip to the next page if elements aren't found
 
-            # Check if CAPTCHA is present
-            if is_captcha_present(driver):
-                log_message(
-                    f"CAPTCHA detected on page {page_num}. Please solve it manually in the browser.",
-                    log_file,
-                )
-                # Pause the script and wait for user to solve CAPTCHA
-                input("Press Enter after solving the CAPTCHA to continue...")
-
-                # Optional: Wait a short moment to ensure CAPTCHA is processed
-                time.sleep(5)
-
-                # After solving CAPTCHA, attempt to find the words again
-                try:
-                    WebDriverWait(driver, 10).until(
-                        EC.presence_of_all_elements_located(
-                            (By.CSS_SELECTOR, "a.word > span")
-                        )
-                    )
-                except TimeoutException:
-                    log_message(
-                        f"After solving CAPTCHA, elements still not found on page {page_num}. Skipping.",
-                        log_file,
-                    )
-                    continue  # Skip to the next page if elements still aren't found
-
-            # Retrieve all span elements that contain the words
             try:
                 span_elements = driver.find_elements(By.CSS_SELECTOR, "a.word > span")
                 if not span_elements:
                     log_message(f"No words found on page {page_num}.", log_file)
                     continue  # Skip to the next page if no words are found
 
-                # Iterate through the list and log each word
                 for idx, span in enumerate(span_elements, start=1):
                     word = span.text.strip()
                     log_entry = f"Page {page_num} - Word {idx}: {word}"
@@ -125,8 +108,7 @@ with open(log_file_path, "w", encoding="utf-8") as log_file:
                 log_message(f"Error extracting words on page {page_num}: {e}", log_file)
                 continue  # Skip to the next page in case of any error
 
-            # Optional: Polite delay to avoid overwhelming the server
-            time.sleep(1)  # Sleep for 1 second between page requests
+            time.sleep(1)
 
     except KeyboardInterrupt:
         log_message("Script interrupted by user.", log_file)
