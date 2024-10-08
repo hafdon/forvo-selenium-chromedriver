@@ -1,17 +1,13 @@
+import argparse
+import time
+import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import (
-    NoSuchElementException,
-    TimeoutException,
-    WebDriverException,
-)
-import time
-import logging
+from selenium.common.exceptions import TimeoutException
 
 # Configure logging
 logging.basicConfig(
@@ -38,11 +34,6 @@ chrome_options.add_argument(
 # Setup ChromeDriver using webdriver_manager
 service = Service(ChromeDriverManager().install())
 
-page_count = 1
-start_page = 27
-# end_page = 198
-end_page = start_page + page_count - 1
-
 
 def process_page(page_num, driver):
     url = f"https://forvo.com/languages-pronunciations/ga/page-{page_num}/"
@@ -50,7 +41,8 @@ def process_page(page_num, driver):
     driver.get(url)
 
     try:
-        WebDriverWait(driver, 1).until(
+
+        WebDriverWait(driver, 5).until(
             lambda d: d.find_elements(By.CSS_SELECTOR, "a.word > span")
         )
     except TimeoutException:
@@ -76,8 +68,20 @@ def process_page(page_num, driver):
 
 
 if __name__ == "__main__":
-    # Open the log file in write mode to start fresh
-    log_message("Found Words:\n")
+    # Define command-line arguments
+    parser = argparse.ArgumentParser(description="Web scraping with Selenium.")
+    parser.add_argument(
+        "--start_page", type=int, default=1, help="Page number to start scraping from."
+    )
+    parser.add_argument(
+        "--page_count", type=int, default=1, help="Number of pages to scrape."
+    )
+    args = parser.parse_args()
+
+    # Set start page and page count from command-line arguments
+    start_page = args.start_page
+    page_count = args.page_count
+    end_page = start_page + page_count - 1
 
     try:
 
@@ -94,6 +98,6 @@ if __name__ == "__main__":
             f"Scraping completed for page {page_num}.",
         )
 
-    log_message(
+    print(
         "All scraping tasks completed. All found words have been logged to 'found_words.log'."
     )
