@@ -23,7 +23,7 @@ def log_message(message):
     logging.info(message)
 
 
-# Optional: Configure Chrome options
+# Configure Chrome options
 chrome_options = Options()
 chrome_options.add_argument("--start-maximized")  # Open browser in maximized mode
 chrome_options.add_argument(
@@ -101,3 +101,4 @@ if __name__ == "__main__":
     print(
         "All scraping tasks completed. All found words have been logged to 'found_words.log'."
     )
+
