@@ -20,7 +20,7 @@ This script scrapes Irish word pronunciations from [Forvo](https://forvo.com) us
 Run the script with the following options:
 
 ```sh
-python scraper.py --start_page <start_page_number> --page_count <number_of_pages>
+python main.py --start_page <start_page_number> --page_count <number_of_pages>
 ```
 
 - `--start_page`: The page number to start scraping from (default: 1).
@@ -29,7 +29,7 @@ python scraper.py --start_page <start_page_number> --page_count <number_of_pages
 ### Example
 
 ```sh
-python scraper.py --start_page 1 --page_count 5
+python main.py --start_page 1
 ```
 
 This will scrape 5 pages starting from page 1 and log the words found to `found_words.log`.
