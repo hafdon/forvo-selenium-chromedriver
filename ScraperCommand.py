@@ -1,11 +1,8 @@
 from Logger import Logger
-
-
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-
-
+import random
 import time
 
 
@@ -26,6 +23,7 @@ class ScraperCommand:
             Logger.log_message(
                 f"Timeout while waiting for elements on page {page_num}."
             )
+            return
 
         try:
             span_elements = self.driver.find_elements(By.CSS_SELECTOR, "a.word > span")
@@ -42,4 +40,4 @@ class ScraperCommand:
             Logger.log_message(f"Error extracting words on page {page_num}: {e}")
             return
 
-        time.sleep(1)
+        time.sleep(random.uniform(2, 5))
