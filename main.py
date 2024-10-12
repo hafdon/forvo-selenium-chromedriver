@@ -1,5 +1,4 @@
 import argparse
-
 from Logger import Logger
 from ScraperCommand import ScraperCommand
 from WebDriverFactory import WebDriverFactory
@@ -10,6 +9,8 @@ from WebDriverFactory import WebDriverFactory
 # The Command Pattern is a behavioral design pattern
 # that turns a request into a stand-alone object containing all information about the request.
 if __name__ == "__main__":
+
+    logger = Logger()
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Web scraping with Selenium.")
     parser.add_argument(

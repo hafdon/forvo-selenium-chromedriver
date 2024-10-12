@@ -18,7 +18,7 @@ class Logger:
                 filename="found_words.log",
                 filemode="a",  # append
                 format="%(asctime)s - %(levelname)s - %(message)s",
-                level=logging.info,
+                level=logging.INFO,
             )
             Logger._instance = self
 
