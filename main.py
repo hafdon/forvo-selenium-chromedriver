@@ -25,8 +25,8 @@ if __name__ == "__main__":
     page_count = args.page_count
     end_page = start_page + page_count - 1
 
+    driver_instance = None  # Initialize driver_instance to None
     try:
-
         driver_instance = WebDriverFactory.create_driver()
         scraper = ScraperCommand(driver_instance)
         for page_num in range(start_page, end_page + 1):
@@ -37,7 +37,15 @@ if __name__ == "__main__":
     except Exception as e:
         Logger.log_message(f"Unexpected error occurred: {e}")
     finally:
-        driver_instance.quit()
+        if driver_instance is not None:
+            try:
+                driver_instance.quit()
+                Logger.log_message("WebDriver has been quit successfully")
+            except Exception as quit_error:
+                Logger.log_message(f"Error while quitting WebDriver: {quit_error}")
+        else:
+            Logger.log_message(f"WebDriver was not initialized; skipping quit.")
+
         Logger.log_message(f"Scraping completed for pages {start_page} to {end_page}.")
 
     print(
