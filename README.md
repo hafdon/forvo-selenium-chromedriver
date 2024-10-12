@@ -19,8 +19,6 @@ A robust and scalable web scraping tool built with Python and Selenium, incorpor
    cd forvo-selenium-chromedriver
    ```
 
-````
-
 2. **Create a virtual environment and activate it**
 
    ```bash
